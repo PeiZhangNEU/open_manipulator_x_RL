@@ -1,0 +1,29 @@
+digraph G {
+node [shape=box];
+"link1" [label="link1"];
+"link2" [label="link2"];
+"link3" [label="link3"];
+"link4" [label="link4"];
+"link5" [label="link5"];
+"camera_link" [label="camera_link"];
+"end_effector_link" [label="end_effector_link"];
+"gripper_link" [label="gripper_link"];
+"gripper_link_sub" [label="gripper_link_sub"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"link1" -> "joint1" [label="xyz: 0.012 0 0.017 \nrpy: 0 -0 0"]
+"joint1" -> "link2"
+"link2" -> "joint2" [label="xyz: 0 0 0.0595 \nrpy: 0 -0 0"]
+"joint2" -> "link3"
+"link3" -> "joint3" [label="xyz: 0.024 0 0.128 \nrpy: 0 -0 0"]
+"joint3" -> "link4"
+"link4" -> "joint4" [label="xyz: 0.124 0 0 \nrpy: 0 -0 0"]
+"joint4" -> "link5"
+"link5" -> "camera_joint" [label="xyz: 0.07 0.032 0.052 \nrpy: 0 -0 0"]
+"camera_joint" -> "camera_link"
+"link5" -> "end_effector_joint" [label="xyz: 0.126 0 0 \nrpy: 0 -0 0"]
+"end_effector_joint" -> "end_effector_link"
+"link5" -> "gripper" [label="xyz: 0.0817 0.021 0 \nrpy: 0 -0 0"]
+"gripper" -> "gripper_link"
+"link5" -> "gripper_sub" [label="xyz: 0.0817 -0.021 0 \nrpy: 0 -0 0"]
+"gripper_sub" -> "gripper_link_sub"
+}
