@@ -10,21 +10,37 @@ stable-baseline3安装参考https://link.zhihu.com/?target=https%3A//stable-base
 
 ## 2. Structure
 open_manipulator_X_Rl
+
 --gym_myrobot
+
   --envs
+  
       __init__.py
+      
       meshes
+      
       --xxx.stl
+      
       --xxx.stl
+      
       --...
+      
       cube_small_target.urdf
+      
       open_manipulator.urdf
+      
       robot_env.py
+      
       robot_reach.py
+      
       real_arm_env.py
+      
   --__init__.py
+  
 --sim_real_test.ipynb
+
 --use_ppo_fixedtarget_train.ipynb
+
 
 ## 3.内容介绍
 主要包含环境和训练代码两部分
