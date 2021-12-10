@@ -42,7 +42,7 @@ class RobotEnv:
         p.setTimeStep(self.timeStep)
         planeUid = p.loadURDF(os.path.join(urdfRootPath,"plane.urdf"), basePosition=[0,0,-0.65])
         # 绝对路径
-        self.pandaUid = p.loadURDF("/home/pp/deeplearning/myrobot_plus/gym_myrobot/envs/open_manipulator.urdf", useFixedBase=True)  # fixedbase 是吧机械臂的底座固定住，不然每次仿真都会乱跑！
+        self.pandaUid = p.loadURDF("./gym_myrobot/envs/open_manipulator.urdf", useFixedBase=True)  # fixedbase 是吧机械臂的底座固定住，不然每次仿真都会乱跑！
         # 重设所有joint的位置
         rest_poses = [0.000, 0.000 ,0.000 ,0.000 ,0.010, 0.010]   # 前四个joint以及两个finger，要符合joint 的限定范围
         for i in range(6):

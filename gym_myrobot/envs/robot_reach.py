@@ -139,12 +139,12 @@ class ReachEnv(gym.Env):
         #                                  orn_target, useFixedBase=1)
         
         if self.targetUid == -1:  
-            self.targetUid = p.loadURDF("/home/pp/deeplearning/myrobot_plus/gym_myrobot/envs/cube_small_target_pick.urdf",    # 根据这个urdf来改我们之前的末端小方块的urdf
+            self.targetUid = p.loadURDF("./gym_myrobot/envs/cube_small_target_pick.urdf",    # 根据这个urdf来改我们之前的末端小方块的urdf
                                         [xpos_target, ypos_target, zpos_target],
                                          orn_target, useFixedBase=1)
         else:
             p.removeBody(self.targetUid)
-            self.targetUid = p.loadURDF("/home/pp/deeplearning/myrobot_plus/gym_myrobot/envs/cube_small_target_pick.urdf",    # 根据这个urdf来改我们之前的末端小方块的urdf
+            self.targetUid = p.loadURDF("./gym_myrobot/envs/cube_small_target_pick.urdf",    # 根据这个urdf来改我们之前的末端小方块的urdf
                                         [xpos_target, ypos_target, zpos_target],
                                          orn_target, useFixedBase=1)
 
