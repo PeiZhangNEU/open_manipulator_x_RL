@@ -115,9 +115,6 @@ class ddpg_agent:
                             input_tensor = self._preproc_inputs(obs, g)
                             pi = self.actor_network(input_tensor)
                             action = self._select_actions(pi)  
-                        # feed the actions into the environment
-                        if epoch >= 100:
-                            action = np.clip(action, -0.15, 0.15)
                         observation_new, _, _, info = self.env.step(action)
                         obs_new = observation_new['observation']
                         ag_new = observation_new['achieved_goal']
