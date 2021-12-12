@@ -1,3 +1,8 @@
+import sys
+import os
+o_path = os.getcwd() # 返回当前工作目录
+sys.path.append(o_path) # 添加自己指定的搜索路径
+
 import os
 import torch
 from models import actor
@@ -5,7 +10,7 @@ from arguments import get_args, Args
 import numpy as np
 from gym_myrobot.envs.robot_reach import ReachEnv
 #加载训练好的模型 数据
-model_path = "saved_models/my_robot_plus/123_True17_model.pt"
+model_path = "saved_models_random_target/my_robot_plus/123_True4_model.pt"
 actions = []
 observations = []
 a_goals, d_goals = [], []
@@ -61,6 +66,7 @@ if __name__ == '__main__':
             with torch.no_grad():
                 pi = actor_network(inputs)
             action = pi.detach().numpy().squeeze()
+            print(action)
             # put actions into the environment
             observation_new, reward, _, info = env.step(action)
             obs = observation_new['observation']

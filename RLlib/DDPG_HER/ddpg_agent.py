@@ -171,7 +171,7 @@ class ddpg_agent:
     # this function will choose action for the agent and do the exploration
     def _select_actions(self, pi):
         action = pi.cpu().numpy().squeeze()                                                              # action直接由actor生成的时候，大小介于[-1,1]之间
-        action = action * self.env_params['action_max']                                                  # 先把action化为 [-0.005, 0.005]之间的数，用乘法而不是裁减
+        # action = action * self.env_params['action_max']                                                  # 先把action化为 [-0.005, 0.005]之间的数，用乘法而不是裁减
         # add the gaussian
         action += self.args.noise_eps * self.env_params['action_max'] * np.random.randn(*action.shape)   # noise_eps * 0.005 是噪声
         action = np.clip(action, -self.env_params['action_max'], self.env_params['action_max'])          # 加过噪声，再裁减一次到[-0.005, 0.005]之间

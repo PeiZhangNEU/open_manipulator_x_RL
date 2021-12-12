@@ -1,0 +1,89 @@
+[36;1mSaving config:
+[0m
+{
+    "args":	null,
+    "env":	null,
+    "exp_name":	"HER_mpi19_random_DDPGTorch_FetchSlide-v1",
+    "logger":	null,
+    "logger_kwargs":	{
+        "exp_name":	"HER_mpi19_random_DDPGTorch_FetchSlide-v1",
+        "output_dir":	"HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123"
+    },
+    "net":	null
+}
+save model to: HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123
+---------------------------------------
+|             Epoch |               0 |
+|             EpRet |            -200 |
+|         EpRealRet |            -200 |
+|         TestEpRet |            -200 |
+|         AverageQ1 |           -4.16 |
+|             StdQ1 |            2.24 |
+|             MaxQ1 |           0.238 |
+|             MinQ1 |           -12.4 |
+|                Q2 |           -4.16 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           1e+04 |
+|         TotalTime |            33.5 |
+---------------------------------------
+save model to: HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123
+---------------------------------------
+|             Epoch |               1 |
+|             EpRet |            -200 |
+|         EpRealRet |            -200 |
+|         TestEpRet |            -200 |
+|         AverageQ1 |           -10.5 |
+|             StdQ1 |            2.68 |
+|             MaxQ1 |           0.164 |
+|             MinQ1 |           -20.5 |
+|                Q2 |           -10.5 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           2e+04 |
+|         TotalTime |            67.4 |
+---------------------------------------
+save model to: HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123
+---------------------------------------
+|             Epoch |               2 |
+|             EpRet |            -200 |
+|         EpRealRet |            -200 |
+|         TestEpRet |            -200 |
+|         AverageQ1 |           -15.8 |
+|             StdQ1 |            3.41 |
+|             MaxQ1 |            1.19 |
+|             MinQ1 |           -27.5 |
+|                Q2 |           -15.8 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           3e+04 |
+|         TotalTime |             101 |
+---------------------------------------
+save model to: HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123
+---------------------------------------
+|             Epoch |               3 |
+|             EpRet |            -200 |
+|         EpRealRet |            -200 |
+|         TestEpRet |            -200 |
+|         AverageQ1 |           -20.2 |
+|             StdQ1 |            4.08 |
+|             MaxQ1 |           0.821 |
+|             MinQ1 |           -32.6 |
+|                Q2 |           -20.2 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           4e+04 |
+|         TotalTime |             136 |
+---------------------------------------
+save model to: HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123
+---------------------------------------
+|             Epoch |               4 |
+|             EpRet |            -200 |
+|         EpRealRet |            -200 |
+|         TestEpRet |            -200 |
+|         AverageQ1 |           -23.8 |
+|             StdQ1 |            4.67 |
+|             MaxQ1 |            1.09 |
+|             MinQ1 |           -38.9 |
+|                Q2 |           -23.8 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           5e+04 |
+|         TotalTime |             170 |
+---------------------------------------
+save model to: HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-56-03-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123

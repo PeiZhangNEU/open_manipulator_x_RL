@@ -78,9 +78,13 @@ class ReachEnv(gym.Env):
         self._robot = RobotEnv()
         self._timeStep = 1. / 200.
         action_dim = 4
+        observation_dim = 9              # 这个设置为9是为了DRL的her算法设置的，因为输入是goal和observation的concate
         self._action_bound = 0.005
+        self._observation_bound = np.inf
         action_high = np.array([self._action_bound] * action_dim)
+        observation_high = np.array([self._observation_bound] * observation_dim)
         self.action_space = spaces.Box(-action_high, action_high)
+        self.observation_space = spaces.Box(-observation_high, observation_high)
         # 重置环境
         self.reset()
 
