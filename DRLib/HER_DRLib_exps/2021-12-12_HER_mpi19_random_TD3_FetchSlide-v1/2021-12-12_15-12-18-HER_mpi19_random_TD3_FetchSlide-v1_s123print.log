@@ -1,0 +1,69 @@
+[36;1mSaving config:
+[0m
+{
+    "args":	null,
+    "env":	null,
+    "exp_name":	"HER_mpi19_random_TD3_FetchSlide-v1",
+    "logger":	null,
+    "logger_kwargs":	{
+        "exp_name":	"HER_mpi19_random_TD3_FetchSlide-v1",
+        "output_dir":	"HER_DRLib_exps/2021-12-12_HER_mpi19_random_TD3_FetchSlide-v1/2021-12-12_15-12-18-HER_mpi19_random_TD3_FetchSlide-v1_s123"
+    },
+    "net":	null
+}
+---------------------------------------
+|             Epoch |               0 |
+|             EpRet |             -50 |
+|         EpRealRet |             -50 |
+|         TestEpRet |             -45 |
+|         AverageQ1 |           -1.42 |
+|             StdQ1 |            2.44 |
+|             MaxQ1 |           0.475 |
+|             MinQ1 |           -27.5 |
+|                Q2 |           -1.42 |
+|       TestSuccess |             0.1 |
+| TotalEnvInteracts |         2.5e+03 |
+|         TotalTime |            19.7 |
+---------------------------------------
+---------------------------------------
+|             Epoch |               1 |
+|             EpRet |             -50 |
+|         EpRealRet |             -50 |
+|         TestEpRet |             -50 |
+|         AverageQ1 |           -2.94 |
+|             StdQ1 |             5.1 |
+|             MaxQ1 |           0.357 |
+|             MinQ1 |           -25.8 |
+|                Q2 |           -2.94 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           5e+03 |
+|         TotalTime |            36.2 |
+---------------------------------------
+---------------------------------------
+|             Epoch |               2 |
+|             EpRet |             -50 |
+|         EpRealRet |             -50 |
+|         TestEpRet |             -45 |
+|         AverageQ1 |           -4.15 |
+|             StdQ1 |            7.51 |
+|             MaxQ1 |           0.857 |
+|             MinQ1 |           -33.9 |
+|                Q2 |           -4.15 |
+|       TestSuccess |             0.1 |
+| TotalEnvInteracts |         7.5e+03 |
+|         TotalTime |            51.3 |
+---------------------------------------
+---------------------------------------
+|             Epoch |               3 |
+|             EpRet |             -50 |
+|         EpRealRet |             -50 |
+|         TestEpRet |             -50 |
+|         AverageQ1 |           -5.25 |
+|             StdQ1 |            9.63 |
+|             MaxQ1 |           0.959 |
+|             MinQ1 |           -36.4 |
+|                Q2 |           -5.25 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           1e+04 |
+|         TotalTime |            68.2 |
+---------------------------------------
