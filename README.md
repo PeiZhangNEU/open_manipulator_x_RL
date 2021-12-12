@@ -69,3 +69,7 @@ action dim = 4 包括四个关节的delta控制量
 
 ## 5.后续更新
 后续将更新其他RLAgent算法在arm上的应用，以及对HER算法的实现
+引用了DRLib的代码，
+欢迎关注知乎帐号：[未入门的炼丹学徒](https://www.zhihu.com/people/heda-he-28)
+
+CSDN帐号：[https://blog.csdn.net/hehedadaq](https://blog.csdn.net/hehedadaq)
