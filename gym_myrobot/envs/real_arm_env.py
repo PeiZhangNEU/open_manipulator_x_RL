@@ -28,6 +28,7 @@ import pybullet as p
 from gym import spaces
 import gym
 
+from gym.utils import seeding
 
 def goal_distance(goal_a, goal_b):
     '''计算到目标位置的距离的差'''
@@ -35,32 +36,36 @@ def goal_distance(goal_a, goal_b):
     # 计算两个坐标的差的2范数
     return np.linalg.norm(goal_a - goal_b, axis=-1)
 
-def get_target_pos():
-    '''得到机械臂工作区域中的末端位置的xyz坐标，均匀采样'''
-    flag = True
-    while flag:
-        x = 0.4 * random.random()
-        y = 0.4 * (random.random() * 2.0 - 1.0)   # 0.4* ([0 ,2] - [1, 1]) = [-0.4, 0.4] 范围内的随机点
-        z = 0.35 * random.random() + 0.05             # 由于生成0高度的点，夹子有宽度，所以中心点贴不到地面，所以需要向上一点移动。[0.05, 0.4]
+# def get_target_pos():
+#     '''得到机械臂工作区域中的末端位置的xyz坐标，均匀采样'''
+#     flag = True
+#     while flag:
+#         x = 0.4 * random.random()
+#         y = 0.4 * (random.random() * 2.0 - 1.0)   # 0.4* ([0 ,2] - [1, 1]) = [-0.4, 0.4] 范围内的随机点
+#         z = 0.35 * random.random() + 0.05             # 由于生成0高度的点，夹子有宽度，所以中心点贴不到地面，所以需要向上一点移动。[0.05, 0.4]
 
-        d_2 = x * x + y * y + z * z    # 点到球心的距离的平方为d_2
+#         d_2 = x * x + y * y + z * z    # 点到球心的距离的平方为d_2
 
-        # 如果距离平方小于半径平方，才返回这次生产的随机点，不然就再次生成一个随机点，这个叫做拒绝法，先在一个长方体里面生产随机点，再拒绝
-        if d_2 < 0.4 *0.4:
-            flag = False
-        else:
-            flag = True
-    return x,y,z
+#         # 如果距离平方小于半径平方，才返回这次生产的随机点，不然就再次生成一个随机点，这个叫做拒绝法，先在一个长方体里面生产随机点，再拒绝
+#         if d_2 < 0.4 *0.4:
+#             flag = False
+#         else:
+#             flag = True
+#     return x,y,z
 
 
-class RealarmEnv(gym.Env):
-    '''这个环境专门为真实机械臂创建，有着可拓展性，以及符合任务环境的要求'''
+class RealarmEnv(gym.GoalEnv):
+    '''这个环境专门为真实机械臂创建，有着可拓展性，以及符合任务环境的要求
+       更新：12/13日
+       目标点位置用和仿真环境一样的方法产生，先得到初始的gripper位置xyz，再在这个位置附近产生tar，随后拒绝掉工作区间外的点
+    '''
     def __init__(self, 
-                 distance_threshold=0.005,
+                 distance_threshold=0.05,
                  reward_type='sparse',
                  use_fixed_target=False,
                  fixed_target=[0.1, 0.1, 0.1],
-                 use_gripper=False):
+                 use_gripper=False,
+                 target_range=0.15):
         # 启动ros
         self.start_ros()
         # 环境的参数
@@ -71,7 +76,7 @@ class RealarmEnv(gym.Env):
         self.distance_threshold = distance_threshold
         self.n_actions = 4
         action_dim = 4
-        self._action_bound = 0.005
+        self._action_bound = 0.05          # action bound改成原来的10倍
         action_high = np.array([self._action_bound] * action_dim)
         # 动作范围
         self.action_space = spaces.Box(-action_high, action_high)
@@ -83,6 +88,9 @@ class RealarmEnv(gym.Env):
         self.joint_delta_limit_high = [0.005, 0.005, 0.005, 0.005]
         self.obs_wait_time = 0.01
         self.excute_time = 0.01
+        self.target_range = target_range
+        self.seed()
+
         # 创建客户端对象，和服务端配套
         #  这是差量控制服务，用于执行差量动作
         self.client_set_joint_delta_goal = rospy.ServiceProxy('/goal_joint_space_path_from_present', SetJointPosition) # 这个本身就直接执行偏差控制量，不需要得到关节值了
@@ -91,8 +99,35 @@ class RealarmEnv(gym.Env):
         if self.use_gripper:
             # 这是控制爪子的client，可以不用，但是可以加上
             self.client_set_gripper_goal = rospy.ServiceProxy('/goal_tool_control', SetJointPosition)
+        
+        # 先把机械臂的各个joint初始化到目标位置
+        self.reset_poses = [0.0, 0.0, 0.0, 0.0]
+        # 机械臂执行初始joints直接到达
+        self.excute_action_direct(self.reset_poses)
+        rospy.sleep(3)  # 重置也需要时间啊，重置完之后等一会儿再getobs，再进行下一轮操作
+        data_pose = rospy.wait_for_message('/gripper/kinematics_pose', KinematicsPose, timeout=None)
+        end_pose = [data_pose.pose.position.x, data_pose.pose.position.y, data_pose.pose.position.z]
+        end_pose = np.array(end_pose)
+        self.initial_gripper_pos = end_pose
+
         # 重置环境
         self.reset()
+        obs = self._get_obs()
+
+        # 空间设置
+        self.observation_space = spaces.Dict(
+            dict(
+                desired_goal=spaces.Box(
+                    -np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype="float32"
+                ),
+                achieved_goal=spaces.Box(
+                    -np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype="float32"
+                ),
+                observation=spaces.Box(
+                    -np.inf, np.inf, shape=obs["observation"].shape, dtype="float32"
+                ),
+            )
+        )
 
     def start_ros(self):
         '''启动ros node，创建类的同时必须首先创建node'''
@@ -174,7 +209,8 @@ class RealarmEnv(gym.Env):
         if self.use_fixed_target:  # 如果使用单点追踪，那么目标点位每一轮都是固定的点
             xpos_target, ypos_target, zpos_target = self.fixed_target[0], self.fixed_target[1], self.fixed_target[2]
         else:
-            xpos_target, ypos_target, zpos_target = get_target_pos()
+            # 换成目标点为target pose从机械臂初始点生成
+            xpos_target, ypos_target, zpos_target = self._sample_goal()
         self.goal = np.array([xpos_target, ypos_target, zpos_target])
         # 设置机械臂初始joints位置
         reset_poses = [0.0, 0.0, 0.0, 0.0]
@@ -184,6 +220,29 @@ class RealarmEnv(gym.Env):
         obs = self._get_obs()
         self._observation = obs
         return self._observation
+
+    def _sample_goal(self):
+        '''按照fetch env改的生成目标点的方法，这个方法生成的是立方体均匀采样的点
+            这些点并不一定在工作区域内，所以可能会有无效点存在，所以需要剔除一些
+        '''
+        flag = True
+        while flag:
+            goal = self.initial_gripper_pos + self.np_random.uniform(
+            -self.target_range, self.target_range, size=3
+            )
+            x, y, z = goal[0], goal[1], goal[2]
+            d_2 = x * x + y * y + z * z    # 点到球心的距离的平方为d_2
+
+            # 如果距离平方小于半径平方，才返回这次生产的随机点，不然就再次生成一个随机点，这个叫做拒绝法，先在一个长方体里面生产随机点，再拒绝
+            if d_2 < 0.4 *0.4:
+                flag = False
+            else:
+                flag = True
+        return x,y,z
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
 
     def step(self, action):
         '''执行delta动作并返回observation'''
