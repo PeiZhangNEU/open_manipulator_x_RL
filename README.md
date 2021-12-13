@@ -1,12 +1,20 @@
 # open_manipulator_x_RL
 ## 1. Introduction
 使用了Openmanipulator-X这一开源机械臂作为控制对象，进行RL在仿真环境中的训练以及模型在实际环境中的使用。
+
 参考网址：https://emanual.robotis.com/docs/en/platform/openmanipulator_x/overview/
+
 操作系统：Ubuntu20.04
+
 Ros版本：noetic
+
 具体安装ros以及机械臂sdk环境请参考官网链接
-RL环境：python3.6，首先安装stable-baseline3环境，然后安装rospackage，再安装pybullet，再安装netifaces即可。
-stable-baseline3安装参考https://link.zhihu.com/?target=https%3A//stable-baselines3.readthedocs.io/en/master/
+
+RL环境：本项目的强化学习训练库主要借鉴了 https://github.com/kaixindelele/DRLib ，先按照其内部readme安装好全部环境。
+（上方网址中勘误：使用anaconda创建 python版本==3.7.7，而不是3.6.9）。
+
+然后再依次安装`pip install pybullet`，以及 `pip install rospkg, pip install catkin-tools`, 以及`pip install netifaces`
+
 
 ## 2. Structure
 open_manipulator_X_Rl
@@ -69,7 +77,6 @@ action dim = 4 包括四个关节的delta控制量
 
 ## 5.后续更新
 后续将更新其他RLAgent算法在arm上的应用，以及对HER算法的实现
-引用了DRLib的代码，
-欢迎关注知乎帐号：[未入门的炼丹学徒](https://www.zhihu.com/people/heda-he-28)
 
-CSDN帐号：[https://blog.csdn.net/hehedadaq](https://blog.csdn.net/hehedadaq)
+更新了环境的目标点产生策略，更新了observation_space
+已经更新了结合HER的多目标点跟踪训练:在DRLib下的`train_open_torh.py` 和 `run_realarm.py`中
