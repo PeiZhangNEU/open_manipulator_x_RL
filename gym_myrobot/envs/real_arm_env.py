@@ -205,6 +205,7 @@ class RealarmEnv(gym.GoalEnv):
 
     def reset(self):
         '''重置环境, 利用excute direct直接把机械臂复原到0000位置'''
+        self.is_lock_gripper = False  # 这个量在每个回合开始产生，用来防止爪子锁死多次
         # 得到一个工作区域内的随机target位置
         if self.use_fixed_target:  # 如果使用单点追踪，那么目标点位每一轮都是固定的点
             xpos_target, ypos_target, zpos_target = self.fixed_target[0], self.fixed_target[1], self.fixed_target[2]
@@ -255,10 +256,12 @@ class RealarmEnv(gym.GoalEnv):
             'is_success':self._is_success(obs['achieved_goal'], self.goal),
         }
         # 在考虑爪子的情况下，如果达到目标，就锁死爪子
-        if self.use_gripper:
+        # 为了锁死爪子一次之后在本回合就不执行了，需要添加一个flag
+        if self.use_gripper and (not self.is_lock_gripper):
             if info['is_success']:
                 self.operate_gripper(-0.01)
                 rospy.sleep(0.4)
+                self.is_lock_gripper = True
 
         reward = self.compute_reward(obs['achieved_goal'], self.goal, info)
         return obs, reward, done, info

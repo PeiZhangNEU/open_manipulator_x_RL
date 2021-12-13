@@ -17,16 +17,24 @@ from spinup_utils.logx import EpochLogger
 from spinup_utils.print_logger import Logger
 
 from gym_myrobot.envs.robot_reach import ReachEnv
+from gym_myrobot.envs.real_arm_env import RealarmEnv
+
+import matplotlib.pyplot as plt
 """
 train the agent, the MPI part code is copy from openai baselines(https://github.com/openai/baselines/blob/master/baselines/her)
 but I ignore it~
 
+Goal环境，网络的好坏取决于success rate， 也就是成功率，而不取决于每个回合的奖励高低，只要回合内部有一步成功了，那就算是成功了！
+
 """
 
-def test_sim(net, env, args):
-    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/DRLib/actor.pth')
-    for i in range(100):
+def test(net, env, args):
+    rs = []
+    env_target = []
+    for i in range(20):
+        episode_r = 0
         obs = env.reset()
+        env_target.append(obs['desired_goal'])
         observation = obs['observation']
         goal = obs['desired_goal']
         observation = np.concatenate((observation, goal))
@@ -34,23 +42,29 @@ def test_sim(net, env, args):
         for j in range(200):
             action = net.get_action(observation)
             obs, r, d, _ = env.step(action)
+            episode_r += r
             observation = obs['observation']
             goal = obs['desired_goal']
             observation = np.concatenate((observation, goal))
             if d:
                 break
-
-def test_real(net, env, args):
-    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/DRLib/actor.pth')
-    for i in range(10):
-        obs = env.reset()
-
+        rs.append(episode_r)
+    plt.figure()
+    plt.plot(rs)
+    plt.show()
+    print(env_target)
 
 
 def launch(net, args):
     # env = gym.make(args.env_name)
     env = ReachEnv(usegui=True)  
+    # 为了保证两个环境中产生的随机目标点是一致的，需要申明seed
     env.seed(args.seed)
+    np.random.seed(args.seed)
+
+    envreal = RealarmEnv(reward_type='sparse',use_gripper=True)
+    # 为了保证两个环境中产生的随机目标点是一致的，需要申明seed, 从实验结果来看，的确是一致的随机数
+    envreal.seed(args.seed)
     np.random.seed(args.seed)
 
     try:
@@ -91,12 +105,17 @@ def launch(net, args):
               clip_return=args.clip_return,
               device=device,
               )
+
+    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/DRLib/actor.pth')
     # restore_path = 'HER_DRLib_exps/2021-02-22_HER_TD3Torch_FetchPush-v1/2021-02-22_14-46-52-HER_TD3Torch_FetchPush-v1_s123/actor.pth'
     # net.load_simple_network(restore_path)
     # trainer(net, env, args)
-    test_sim(net, env, args)
-    # test_real(net, env, args)
+    # test_sim(net, env, args)
+    # 测试仿真环境
+    test(net, env, args)
 
+    # 测试真实环境
+    test(net, envreal, args)
 
 if __name__ == '__main__':
     # take the configuration for the HER
