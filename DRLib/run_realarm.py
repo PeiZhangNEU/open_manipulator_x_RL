@@ -24,7 +24,7 @@ but I ignore it~
 """
 
 def test_sim(net, env, args):
-    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-59-43-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123/actor.pth')
+    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/DRLib/actor.pth')
     for i in range(100):
         obs = env.reset()
         observation = obs['observation']
@@ -41,7 +41,7 @@ def test_sim(net, env, args):
                 break
 
 def test_real(net, env, args):
-    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/HER_DRLib_exps/2021-12-12_HER_mpi19_random_DDPGTorch_FetchSlide-v1/2021-12-12_16-59-43-HER_mpi19_random_DDPGTorch_FetchSlide-v1_s123/actor.pth')
+    net.load_simple_network('/home/pp/deeplearning/open_manipulator_x_RL/DRLib/actor.pth')
     for i in range(10):
         obs = env.reset()
 

@@ -1,8 +1,3 @@
-import sys
-import os
-o_path = os.getcwd() # 返回当前工作目录
-sys.path.append(o_path) # 添加自己指定的搜索路径
-
 import numpy as np
 import gym
 import os, sys
@@ -15,8 +10,6 @@ import time
 from spinup_utils.logx import setup_logger_kwargs, colorize
 from spinup_utils.logx import EpochLogger
 from spinup_utils.print_logger import Logger
-
-from gym_myrobot.envs.robot_reach import ReachEnv
 """
 train the agent, the MPI part code is copy from openai baselines(https://github.com/openai/baselines/blob/master/baselines/her)
 but I ignore it~
@@ -111,9 +104,6 @@ def trainer(net, env, args):
                       "\ttime:", np.round(time.time()-episode_time, 3),
                       '\tdone:', sum(success))
 
-        # # 存储每一个epoch的模型actor
-        # net.save_simple_network(logger_kwargs["output_dir"])
-
         test_ep_reward, logger = net.test_agent(args=args,
                                                 env=env,
                                                 n=10,
@@ -142,8 +132,7 @@ def trainer(net, env, args):
 
 
 def launch(net, args):
-    # env = gym.make(args.env_name)
-    env = ReachEnv(usegui=True)  
+    env = gym.make(args.env_name)
     env.seed(args.seed)
     np.random.seed(args.seed)
 

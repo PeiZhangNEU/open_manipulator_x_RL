@@ -23,7 +23,7 @@ def get_args():
 
     parser.add_argument('--n_epochs', type=int, default=500, help='the number of epochs to train the agent')
     parser.add_argument('--n_cycles', type=int, default=50, help='the times to collect samples per epoch')
-    parser.add_argument('--n_steps', type=int, default=100)
+    parser.add_argument('--n_steps', type=int, default=200)
 
     parser.add_argument('--n_batches', type=int, default=40, help='the times to update the network')
     parser.add_argument('--save_interval', type=int, default=5, help='the interval that save the trajectory')
@@ -51,7 +51,7 @@ def get_args():
     parser.add_argument('--cuda', type=bool, default=True, help='if use gpu do the acceleration')
     parser.add_argument('--gpu_id',
                         type=float, default=0, help='gpu id')
-    parser.add_argument('--render', type=bool, default=True, help='if render')
+    parser.add_argument('--render', type=bool, default=False, help='if render')
     parser.add_argument('--sess_opt', type=float, default=0.1, help='the Memory-Usage rate of GPU')
     parser.add_argument('--num_rollouts_per_mpi', type=int, default=2, help='the rollouts per mpi')
     parser.add_argument('--her', type=bool,

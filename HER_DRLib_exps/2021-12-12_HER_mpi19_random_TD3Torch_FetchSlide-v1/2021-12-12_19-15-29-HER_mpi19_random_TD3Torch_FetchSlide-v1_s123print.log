@@ -1,0 +1,14 @@
+[36;1mSaving config:
+[0m
+{
+    "args":	null,
+    "env":	null,
+    "exp_name":	"HER_mpi19_random_TD3Torch_FetchSlide-v1",
+    "logger":	null,
+    "logger_kwargs":	{
+        "exp_name":	"HER_mpi19_random_TD3Torch_FetchSlide-v1",
+        "output_dir":	"HER_DRLib_exps/2021-12-12_HER_mpi19_random_TD3Torch_FetchSlide-v1/2021-12-12_19-15-29-HER_mpi19_random_TD3Torch_FetchSlide-v1_s123"
+    },
+    "net":	null
+}
+Creating window glfw

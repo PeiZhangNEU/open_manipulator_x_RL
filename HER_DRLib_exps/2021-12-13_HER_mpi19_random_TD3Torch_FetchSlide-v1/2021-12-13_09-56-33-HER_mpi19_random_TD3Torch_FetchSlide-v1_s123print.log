@@ -1,0 +1,41 @@
+[36;1mSaving config:
+[0m
+{
+    "args":	null,
+    "env":	null,
+    "exp_name":	"HER_mpi19_random_TD3Torch_FetchSlide-v1",
+    "logger":	null,
+    "logger_kwargs":	{
+        "exp_name":	"HER_mpi19_random_TD3Torch_FetchSlide-v1",
+        "output_dir":	"HER_DRLib_exps/2021-12-13_HER_mpi19_random_TD3Torch_FetchSlide-v1/2021-12-13_09-56-33-HER_mpi19_random_TD3Torch_FetchSlide-v1_s123"
+    },
+    "net":	null
+}
+---------------------------------------
+|             Epoch |               0 |
+|             EpRet |             -98 |
+|         EpRealRet |             -98 |
+|         TestEpRet |            -100 |
+|         AverageQ1 |           -1.66 |
+|             StdQ1 |            2.07 |
+|             MaxQ1 |            1.51 |
+|             MinQ1 |           -13.4 |
+|                Q2 |           -1.66 |
+|       TestSuccess |               0 |
+| TotalEnvInteracts |           5e+03 |
+|         TotalTime |            45.7 |
+---------------------------------------
+---------------------------------------
+|             Epoch |               1 |
+|             EpRet |            -100 |
+|         EpRealRet |            -100 |
+|         TestEpRet |           -92.6 |
+|         AverageQ1 |           -4.68 |
+|             StdQ1 |            4.48 |
+|             MaxQ1 |            2.47 |
+|             MinQ1 |           -21.1 |
+|                Q2 |           -4.68 |
+|       TestSuccess |             0.1 |
+| TotalEnvInteracts |           1e+04 |
+|         TotalTime |            89.6 |
+---------------------------------------

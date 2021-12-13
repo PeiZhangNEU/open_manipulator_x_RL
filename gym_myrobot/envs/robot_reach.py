@@ -25,36 +25,18 @@ def goal_distance(goal_a, goal_b):
     # 计算两个坐标的差的2范数
     return np.linalg.norm(goal_a - goal_b, axis=-1)
 
-def get_target_pos():
-    '''得到机械臂工作区域中的末端位置的xyz坐标，均匀采样'''
-    flag = True
-    while flag:
-        x = 0.4 * random.random()
-        y = 0.4 * (random.random() * 2.0 - 1.0)   # 0.4* ([0 ,2] - [1, 1]) = [-0.4, 0.4] 范围内的随机点
-        z = 0.35 * random.random() + 0.05             # 由于生成0高度的点，夹子有宽度，所以中心点贴不到地面，所以需要向上一点移动。[0.05, 0.4]
-
-        d_2 = x * x + y * y + z * z    # 点到球心的距离的平方为d_2
-
-        # 如果距离平方小于半径平方，才返回这次生产的随机点，不然就再次生成一个随机点，这个叫做拒绝法，先在一个长方体里面生产随机点，再拒绝
-        if d_2 < 0.4 *0.4:
-            flag = False
-        else:
-            flag = True
-    return x,y,z
-
-
-
-class ReachEnv(gym.Env):
+class ReachEnv(gym.GoalEnv):
     '''
     继承gymEnv
     '''
     def __init__(self,
                  n_substeps=40,                 # 每次给的0.005的deltajoint的值，需要大概40/200=0.2s的时间才能执行完毕
-                 distance_threshold=0.005,      # 设置终点和目标点之间距离的限制成功标准，因为方块比较小，经过实验，0.005是一个很好的限制范围，达到这个范围内可以很精确的重合 
+                 distance_threshold=0.05,      # 设置终点和目标点之间距离的限制成功标准，因为方块比较小，经过实验，0.005是一个很好的限制范围，达到这个范围内可以很精确的重合 
                  reward_type='sparse', 
                  usegui=False,
                  usegripper=False,
                  use_fixed_target=False,
+                 target_range=0.15,
                  fixed_target=[0.1, 0.1, 0.1]):
         IS_USEGUI = usegui
         self.usegripper = usegripper
@@ -78,15 +60,37 @@ class ReachEnv(gym.Env):
         self._robot = RobotEnv()
         self._timeStep = 1. / 200.
         action_dim = 4
-        observation_dim = 9              # 这个设置为9是为了DRL的her算法设置的，因为输入是goal和observation的concate
-        self._action_bound = 0.005
-        self._observation_bound = np.inf
+        self._action_bound = 0.05   # 如果把动作bound增大10倍
         action_high = np.array([self._action_bound] * action_dim)
-        observation_high = np.array([self._observation_bound] * observation_dim)
-        self.action_space = spaces.Box(-action_high, action_high)
-        self.observation_space = spaces.Box(-observation_high, observation_high)
+        self.rest_poses = [0.000, 0.000 ,0.000 ,0.000 ,0.010, 0.010]
+        self.target_range = target_range
+        # 给出所有的要设置的关节位置需要得到初始的 xpos
+        for i in range(6):
+            p.resetJointState(self._robot.pandaUid, i, self.rest_poses[i], 0)  # 设置初始化的位置，以及速度
+        p.setTimeStep(self._timeStep)
+        end_pos_orn = np.array(self._robot.getObservation())
+        self.initial_gripper_pos = np.array(end_pos_orn[:3]).reshape(-1)
+
         # 重置环境
         self.reset()
+        obs = self._get_obs()
+
+        # 空间设置
+        self.action_space = spaces.Box(-action_high, action_high)
+        self.observation_space = spaces.Dict(
+            dict(
+                desired_goal=spaces.Box(
+                    -np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype="float32"
+                ),
+                achieved_goal=spaces.Box(
+                    -np.inf, np.inf, shape=obs["achieved_goal"].shape, dtype="float32"
+                ),
+                observation=spaces.Box(
+                    -np.inf, np.inf, shape=obs["observation"].shape, dtype="float32"
+                ),
+            )
+        )
+        
 
     def compute_reward(self, achieved_goal, goal, info):
         '''计算奖励，有不稀疏和稀疏两种计算方法'''
@@ -122,9 +126,8 @@ class ReachEnv(gym.Env):
         '''重置所有位置，包括机械臂以及目标位置，目标位置用一个没有实体的红色小方块来表示， 这个urdf可以加载进来我们机械臂末端小方块的模型，但是不实体化,
            在这里，目标位置的设置是随机点，需要大改！这里需要好好改一下才能用。
         '''
-        rest_poses = [0.000, 0.000 ,0.000 ,0.000 ,0.010, 0.010]   # 前四个joint以及两个finger，要符合joint 的限定范围
         for i in range(6):
-            p.resetJointState(self._robot.pandaUid, i, rest_poses[i], 0)  # 设置初始化的位置，以及速度
+            p.resetJointState(self._robot.pandaUid, i, self.rest_poses[i], 0)  # 设置初始化的位置，以及速度
         p.setTimeStep(self._timeStep)
 
         # 目标小方块的pose, 也就是目标点的位置，和旋转方向，这个应该参照pick环境设置
@@ -133,12 +136,13 @@ class ReachEnv(gym.Env):
         if self.use_fixed_target:  # 如果使用单点追踪，那么目标点位每一轮都是固定的点
             xpos_target, ypos_target, zpos_target = self.fixed_target[0], self.fixed_target[1], self.fixed_target[2]
         else:
-            xpos_target, ypos_target, zpos_target = get_target_pos()
+            # 换成目标点为target pose从机械臂初始点生成
+            xpos_target, ypos_target, zpos_target = self._sample_goal()
         ang_target = 3.14 * 0.5 + 3.1415925438 * random.random()
         orn_target = p.getQuaternionFromEuler([0, 0, ang_target])      
 
         # # 这里的if else 语句是为了每次reset都移除上次产生的目标点，不然会有好多个目标点一次次累加出现在屏幕上
-        # self.targetUid = p.loadURDF("/home/zp/deeplearning/myrobot_plus/gym_myrobot/envs/cube_small_target_pick.urdf",    # 根据这个urdf来改我们之前的末端小方块的urdf
+        # self.targetUid = p.loadURDF("./gym_myrobot/envs/cube_small_target_pick.urdf",    # 根据这个urdf来改我们之前的末端小方块的urdf
         #                                 [xpos_target, ypos_target, zpos_target],
         #                                  orn_target, useFixedBase=1)
         
@@ -172,6 +176,27 @@ class ReachEnv(gym.Env):
         self._observation = obs
         return self._observation
     
+    def _sample_goal(self):
+        '''按照fetch env改的生成目标点的方法，这个方法生成的是立方体均匀采样的点
+            这些点并不一定在工作区域内，所以可能会有无效点存在，所以需要剔除一些
+        '''
+        flag = True
+        while flag:
+            goal = self.initial_gripper_pos + self.np_random.uniform(
+            -self.target_range, self.target_range, size=3
+            )
+            x, y, z = goal[0], goal[1], goal[2]
+            d_2 = x * x + y * y + z * z    # 点到球心的距离的平方为d_2
+
+            # 如果距离平方小于半径平方，才返回这次生产的随机点，不然就再次生成一个随机点，这个叫做拒绝法，先在一个长方体里面生产随机点，再拒绝
+            if d_2 < 0.4 *0.4:
+                flag = False
+            else:
+                flag = True
+        return x,y,z
+        
+
+
 
     def _set_action(self, action):
         '''利用基环境执行动作'''
@@ -188,6 +213,7 @@ class ReachEnv(gym.Env):
         end_orn = p.getEulerFromQuaternion(end_orn_quaternion)
         end_orn = np.array(end_orn)
 
+        # 目标位置，作为desiredgoal
         target_pos = np.array(p.getBasePositionAndOrientation(self.targetUid)[0])
         # obs 是两个array组成的列表，长度为0，1
         obs = [
